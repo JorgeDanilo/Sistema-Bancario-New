@@ -32,7 +32,8 @@ public class OperacoesBancariasBean implements Serializable {
 	}
 
 	private void inicializarOperacoesConta() {
-		// TODO Auto-generated method stub
+		
+		this.contaCliente = this.contaService.buscarContaPorCliente(clienteSelecionado);
 		
 	}
 
