@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<ui:composition template="/WEB-INF/template/Layout.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:head/>
+	<ui:define name="corpo">
+	
+		<h1 style="margin-top: 35px;">Operações</h1>
+		
+		<h:form id="frm">
+		
+		<p:growl id="growl" showDetail="false" showSummary="true" autoUpdate="true"/> 
+		
+		 	<p:toolbar id="toolbar">
+		 		<f:facet name="left">
+		 			<p:commandButton value="Novo Cliente" icon="ui-icon-document"
+		 				process="@this"
+		 				update="@form"
+		 				oncomplete="PF('painelDialog').show()" >
+		 				<p:resetInput target="dialog-modal" />
+		 			</p:commandButton>
+		 			
+		 			<span class="ui-separator"> 
+						<span class="ui-icon ui-icon-grip-dotted-vertical" />
+					</span>
+					
+					<p:commandButton value="Operações Bancárias" icon="ui-icon-document" 
+						disabled="#{manterClienteBean.clienteSelecionado == null}"
+						process="@this"
+						update="@form"
+						oncomplete="PF('dlgOperacoesBancarias').show()" >
+		 			</p:commandButton>
+					
+		 		</f:facet>
+		 	</p:toolbar>
+			
+		
+		<p:dataTable emptyMessage="Nenhum Cliente Encontrado" id="tbClientes"
+			var="cliente" value="#{manterClienteBean.clientesCadastrados}" 
+			style="margin-top: 10px;" paginator="true" rows="10"
+			selection="#{manterClienteBean.clienteSelecionado}" 
+			selectionMode="single" rowKey="#{cliente.identificador}" >
+			
+			<p:ajax event="rowSelect" update=":frm:toolbar" />
+			<p:ajax event="rowUnselect" update=":frm:toolbar" />
+			
+			
+			<p:column headerText="Código" width="20">
+				<p:outputLabel value="#{cliente.identificador}" />
+			</p:column>
+			
+			<p:column headerText="Nome" width="100">
+				<p:outputLabel value="#{cliente.nome}" />
+			</p:column>
+			
+			<p:column headerText="E-mail" width="100">
+				<p:outputLabel value="#{cliente.email}" />
+			</p:column>
+			
+			<p:column headerText="CPF" width="100">
+				<p:outputLabel value="#{cliente.cpf}" />
+			</p:column>
+			
+			<p:column headerText="Telefone" width="100">
+				<p:outputLabel value="#{cliente.telefone}" />
+			</p:column>
+			
+			
+		</p:dataTable>
+		
+		<p:dialog header="Novo Cliente" widgetVar="painelDialog" 
+			id="dialog-modal" modal="true"
+			resizable="false" closeOnEscape="true" draggable="false" >
+			
+			<p:messages id="msg-dialog" />
+			
+				<h:panelGrid columns="2" style="margin-top: 20px;" id="pn-dialog">
+			
+				<p:outputLabel value="Nome" for="nome"/>
+				<p:inputText id="nome" value="#{manterClienteBean.cliente.nome}" style="width: 300px;"/>
+				
+				<p:outputLabel for="cpf" value="CPF" />
+				<p:inputText id="cpf" value="#{manterClienteBean.cliente.cpf}" style="width: 300px;"/>
+				
+				<p:outputLabel for="email" value="Email" />
+				<p:inputText id="email" value="#{manterClienteBean.cliente.email}" maxlength="100" style="width: 300px;"/>
+				
+				<p:outputLabel for="telefone" value="Telefone" />
+				<p:inputMask id="telefone" mask="99-9?99999999" value="#{manterClienteBean.cliente.telefone}" style="width: 300px;"/>
+				
+				<p:outputLabel for="endereco" value="Endereço" />
+				<p:inputText id="endereco" value="#{manterClienteBean.cliente.endereco}" style="width: 300px;"/>
+				
+				<p:outputLabel for="dtNascimento" value="Data de Nascimento" />
+				<p:calendar id="dtNascimento" pattern="dd/MM/yyyy" value="#{manterClienteBean.cliente.dtNascimento}" />
+				
+			</h:panelGrid>
+			
+			<p:commandButton value="Salvar" 
+				action="#{manterClienteBean.salvar()}" 
+				process="dialog-modal"
+				update="msg-dialog pn-dialog frm:tbClientes"
+				oncomplete="if(!args.validationFailded) PF('painelDialog').hide() "	/>
+		
+		</p:dialog>
+		
+		<p:dialog header="Operações Bancárias" 
+			widgetVar="dlgOperacoesBancarias" id="dlgOpBancarias" modal="true"
+			resizable="false" closeOnEscape="true" draggable="false" width="600" height="450">
+			
+			<p:fieldset legend="Dados do Cliente">
+				<h:panelGrid columns="2" id="pn-op-bancarias">
+				
+					<p:outputLabel value="Nome:  " style="font-weight: bold"/>
+					<p:outputLabel value="#{manterClienteBean.clienteSelecionado.nome}" />
+					
+					<p:outputLabel value="Cpf: " style="font-weight: bold"/>
+					<p:outputLabel value="#{manterClienteBean.clienteSelecionado.cpf}" />
+					
+					<p:outputLabel value="Telefone: " style="font-weight: bold"/>
+					<p:outputLabel value="#{manterClienteBean.clienteSelecionado.telefone}" />
+					
+				</h:panelGrid>
+			</p:fieldset>
+			
+			<h:panelGrid columns="4">
+				<p:commandButton value="Abrir Conta" 
+					process="@this"
+					update="@form"
+					oncomplete="PF('dlgCriarConta').show()" />
+				<p:commandButton value="Depósito" disabled="true"/>
+				<p:commandButton value="Saque" disabled="true"/>
+				<p:commandButton value="Transferência" disabled="true"/>			
+			</h:panelGrid>
+			
+			<br/>
+			<br/>
+			
+			<p:fieldset legend="Histórico de Transações">
+			
+				<p:dataTable emptyMessage="Nenhum Histórico encontrado">
+					<p:column headerText="Tipo Transação" width="10">
+						<p:outputLabel value="SAQUE" />
+					</p:column>
+					
+					<p:column headerText="Titular/Conta Destino" width="10">
+						<p:outputLabel value="Jorge" />
+					</p:column>
+					
+					<p:column headerText="Titular/Conta Débito" width="10">
+						<p:outputLabel value="Monstro" />
+					</p:column>
+					
+					<p:column headerText="Data" width="10">
+						<p:outputLabel value="20/11/2007" />
+					</p:column>
+					
+					<p:column headerText="Valor" width="10">
+						<p:outputLabel value="R$ 250,00" />
+					</p:column>
+					
+				</p:dataTable>
+				
+			</p:fieldset>
+				
+		</p:dialog>
+		
+		<p:dialog header="Abrir Conta"  widgetVar="dlgCriarConta" id="dlg-criar-conta" 
+			modal="true" resizable="false" 
+			closeOnEscape="true" draggable="false" 
+			width="350" height="160" >
+			
+			<h:panelGrid columns="2" style="margin-top: 20px;" id="pnl-criar-conta">	
+				
+				<p:outputLabel for="dataAbertura" value="Abertura: "/>
+				<p:outputLabel id="dataAbertura" value="#{operacoesBancariasBean.contaCliente.dataAbertura}" >
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</p:outputLabel>
+				
+				<p:outputLabel for="numConta" value="Número: "/>
+				<p:inputText id="numConta" value="#{operacoesBancariasBean.contaCliente.numero}"/>
+				
+				<p:outputLabel for="saldoInicial" value="Saldo Inicial: "/>
+				<p:inputText id="saldoInicial" value="#{operacoesBancariasBean.contaCliente.saldo}"/>
+
+
+				<p:commandButton value="Salvar" action="#{operacoesBancariasBean.abrirConta()}" />
+				<p:commandButton value="Cancelar" />
+				
+			</h:panelGrid>
+			
+			
+			
+		</p:dialog>
+		
+		
+		</h:form>
+		
+	</ui:define>
+</ui:composition>
