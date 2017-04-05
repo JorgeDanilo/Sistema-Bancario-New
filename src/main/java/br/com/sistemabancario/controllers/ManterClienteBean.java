@@ -10,8 +10,10 @@ import javax.inject.Named;
 
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.modelo.Conta;
+import br.com.sistemabancario.modelo.Transacao;
 import br.com.sistemabancario.services.ClienteService;
 import br.com.sistemabancario.services.ContaService;
+import br.com.sistemabancario.services.TransacaoService;
 import br.com.sistemabancario.util.FacesMessages;
 
 @Named
@@ -34,15 +36,20 @@ public class ManterClienteBean implements Serializable {
 	@Inject
 	private OperacoesBancariasBean operacoesBancariasBean = new OperacoesBancariasBean();
 	
-	private Collection<Cliente> clientesCadastrados;
+	@Inject
+	private TransacaoService transacaoService;
 	
-	private static final String MSG_ALTERADO = "Cliente alterado com sucesso";
-
-	private static final String MSG_CADASTRO = "Cliente cadastrado com sucesso";
+	private Collection<Cliente> clientesCadastrados;
 	
 	private Cliente ClienteSelecionado;
 
 	private Conta contaCliente = new Conta();
+	
+	private Collection<Transacao> transacaoConta;
+	
+	private static final String MSG_ALTERADO = "Cliente alterado com sucesso";
+
+	private static final String MSG_CADASTRO = "Cliente cadastrado com sucesso";
 	
 	@PostConstruct
 	private void inicializaLista() {
@@ -52,16 +59,6 @@ public class ManterClienteBean implements Serializable {
 		this.cliente = new Cliente();
 	}
 	
-	
-	/**
-	 * Método responsável por limpar os dados.
-	 * 
-	 * @author Jorge Danilo Gomes da Silva
-	 */
-	public void limpar() {
-		
-		this.cliente = new Cliente();
-	}
 	
 	
 	/**
@@ -107,31 +104,34 @@ public class ManterClienteBean implements Serializable {
 
 	
 	/**
-	 * Método responsavel por redirecionar para a tela de operações bancarias.
-	 * 
-	 * @author Jorge Danilo Gomes da Silva
-	 * @return
-	 */
-	public String irOperacoesBancarias() {
-		return "operacoesBancarias.xhtml";
-	}
-
-	
-	/**
 	 *  Método responsável por buscar o a conta do cliente.
 	 */
 	public void inicializarOperacoesBancarias() {
 		
 		this.contaCliente = this.contaService.buscarContaPorCliente(ClienteSelecionado);
 		
-		if ( ClienteSelecionado != null ) {
+		if ( ClienteSelecionado != null && this.contaCliente != null ) {
 			
 			this.operacoesBancariasBean.setClienteSelecionado(ClienteSelecionado);
 			
 			this.operacoesBancariasBean.setContaCliente(new Conta());
+			
+			this.setTransacaoConta(this.transacaoService.listarTransacoesPorConta(contaCliente.getIdentificador()));
+			
 		}
 		
 	}
+	
+	/**
+	 * Método responsável por limpar os dados.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 */
+	public void limpar() {
+		
+		this.cliente = new Cliente();
+	}
+	
 	
 	public Cliente getCliente() {
 		return cliente;
@@ -176,7 +176,16 @@ public class ManterClienteBean implements Serializable {
 	public void setContaCliente(Conta contaCliente) {
 		this.contaCliente = contaCliente;
 	}
-	
+
+
+	public Collection<Transacao> getTransacaoConta() {
+		return transacaoConta;
+	}
+
+
+	public void setTransacaoConta(Collection<Transacao> transacaoConta) {
+		this.transacaoConta = transacaoConta;
+	}
 	
 
 }

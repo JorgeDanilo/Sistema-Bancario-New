@@ -1,6 +1,6 @@
 package br.com.sistemabancario.excecoes;
 
-public class ContaNaoExisteException extends Exception{
+public class ContaNaoExisteException extends Exception {
 
 	private static final long serialVersionUID = -2692264935862218672L;
 

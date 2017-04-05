@@ -31,6 +31,7 @@ public class TransacaoService implements Serializable {
 	 * @param identificador
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public Collection<Transacao> listarTransacoesPorConta(Long identificador) {
 		
 		Session session = (Session) this.manager.getDelegate();

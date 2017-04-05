@@ -41,8 +41,6 @@ public class OperacoesBancariasBean implements Serializable {
 	
 	private int numeroContaDeposito;
 	
-	private Collection<Transacao> transacaoConta;
-	 
 	/**
 	 * Método responsavel por abrir uma conta para o usuario.
 	 * 
@@ -141,11 +139,6 @@ public class OperacoesBancariasBean implements Serializable {
 		
 		this.valorDeposito = 0D;
 		
-		if ( this.contaCliente != null && this.contaCliente.getIdentificador() !=  null ) {
-			
-			this.setTransacaoConta(this.transacaoService.listarTransacoesPorConta(contaCliente.getIdentificador()));
-		}
-		
 	}
 
 	
@@ -180,16 +173,6 @@ public class OperacoesBancariasBean implements Serializable {
 
 	public void setValorSaque(Double valorSaque) {
 		this.valorSaque = valorSaque;
-	}
-
-
-	public Collection<Transacao> getTransacaoConta() {
-		return transacaoConta;
-	}
-
-
-	public void setTransacaoConta(Collection<Transacao> transacaoConta) {
-		this.transacaoConta = transacaoConta;
 	}
 
 

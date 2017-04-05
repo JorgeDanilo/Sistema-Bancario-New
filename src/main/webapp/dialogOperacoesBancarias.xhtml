@@ -56,7 +56,7 @@
 				<legend>Histórico de Transações</legend>
 			
 				<p:dataTable emptyMessage="Nenhum Histórico encontrado" var="transacao"
-					value="#{operacoesBancariasBean.transacaoConta}">
+					value="#{manterClienteBean.transacaoConta}">
 					<p:column headerText="Tipo Transação" width="10">
 						<p:outputLabel value="#{transacao.tipoTransacao}" />
 					</p:column>
@@ -70,7 +70,9 @@
 					</p:column>
 					
 					<p:column headerText="Data" width="10">
-						<p:outputLabel value="#{transacao.data}" />
+						<p:outputLabel value="#{transacao.data}" >
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</p:outputLabel>
 					</p:column>
 					
 					<p:column headerText="Valor" width="10">

@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-
+import br.com.sistemabancario.dao.ContaDao;
 import br.com.sistemabancario.excecoes.ContaNaoExisteException;
 import br.com.sistemabancario.excecoes.SaldoInsuficienteException;
 import br.com.sistemabancario.modelo.Cliente;
@@ -19,7 +16,8 @@ import br.com.sistemabancario.util.Transacional;
 import br.com.sistemabancario.util.UtilData;
 
 /**
- * Classe de Servico responsavel por implementação das regras de negocio.
+ * Classe de Servico responsavel por implementação das regras de negócio.
+ * 
  * @author Jorge Danilo Gomes da Silva
  */
 public class ContaService implements Serializable {
@@ -27,7 +25,7 @@ public class ContaService implements Serializable {
 	private static final long serialVersionUID = -3052031878124202391L;
 	
 	@Inject
-	private EntityManager manager;
+	private ContaDao contaDao;
 	
 	@Inject
 	private TransacaoService transacaoService;
@@ -35,7 +33,9 @@ public class ContaService implements Serializable {
 	@Transacional
 	public void salvar(Conta conta) {
 		
-		this.manager.merge(conta);
+		this.contaDao.salvar(conta);
+		
+//		this.manager.merge(conta);
 	}
 
 	
@@ -62,11 +62,13 @@ public class ContaService implements Serializable {
 	
 	public Collection<Conta> listar() {
 		
-		Session session = (Session) manager.getDelegate();
+		return this.getContaDao().listar();
 		
-		Criteria criteria = session.createCriteria(Conta.class);
-		
-		return criteria.list();
+//		Session session = (Session) manager.getDelegate();
+//		
+//		Criteria criteria = session.createCriteria(Conta.class);
+//		
+//		return criteria.list();
 	}
 
 	
@@ -77,7 +79,9 @@ public class ContaService implements Serializable {
 
 			contaSaque.setSaldo(contaSaque.getSaldo() - valor);
 			
-			this.manager.merge(contaSaque);
+//			this.manager.merge(contaSaque);
+			
+			this.getContaDao().salvar(contaSaque);
 
 			this.historicoTransacao(null, contaSaque, valor, "saque na conta " + contaSaque.getNumero(), EnumTipoTransacao.SAQUE);
 
@@ -105,11 +109,15 @@ public class ContaService implements Serializable {
 		
 		contaDestino.setSaldo(contaDestino.getSaldo() + valor);
 
-		this.manager.merge(contaOrigem);
+//		this.manager.merge(contaOrigem);
+//		
+//		this.manager.merge(contaDestino);
 		
-		this.manager.merge(contaDestino);
+		this.getContaDao().salvar(contaOrigem);
 		
-		this.historicoTransacao(null, contaDestino, valor, "deposito na conta" + contaDestino.getNumero(), EnumTipoTransacao.DEPOSITO);
+		this.getContaDao().salvar(contaDestino);
+		
+		this.historicoTransacao(contaOrigem, contaDestino, valor, "deposito na conta " + contaDestino.getNumero(), EnumTipoTransacao.DEPOSITO);
 		
 	}
 	
@@ -163,5 +171,16 @@ public class ContaService implements Serializable {
 		throw new ContaNaoExisteException();
 		
 	}
+
+
+	/**
+	 * Responsavel por retornar a instancia da classe ContaDao.
+	 * @return
+	 */
+	public ContaDao getContaDao() {
+		return contaDao;
+	}
+	
+	
 
 }
