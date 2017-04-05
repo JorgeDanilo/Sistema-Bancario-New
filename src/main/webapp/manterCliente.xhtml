@@ -45,8 +45,8 @@
 			selection="#{manterClienteBean.clienteSelecionado}" 
 			selectionMode="single" rowKey="#{cliente.identificador}" >
 			
-			<p:ajax event="rowSelect" update=":frm:toolbar" />
-			<p:ajax event="rowUnselect" update=":frm:toolbar" />
+			<p:ajax event="rowSelect" update=":frm:toolbar" listener="#{manterClienteBean.inicializarOperacoesBancarias()}" />
+			<p:ajax event="rowUnselect" update=":frm:toolbar" listener="#{manterClienteBean.inicializarOperacoesBancarias()}" />
 			
 			
 			<p:column headerText="Código" width="20">
@@ -131,11 +131,15 @@
 				<p:commandButton value="Abrir Conta" 
 					process="@this"
 					update="@form"
+					disabled="#{manterClienteBean.contaCliente.identificador != null}"
 					oncomplete="PF('dlgCriarConta').show()" >
 					</p:commandButton>
-				<p:commandButton value="Depósito" disabled="true"/>
-				<p:commandButton value="Saque" disabled="true"/>
-				<p:commandButton value="Transferência" disabled="true"/>			
+				<p:commandButton value="Depósito" disabled="#{manterClienteBean.contaCliente.identificador eq null}"/>
+				<p:commandButton value="Saque" disabled="#{manterClienteBean.contaCliente.identificador eq null}" 
+					process="@this"
+					update="@form"
+					oncomplete="PF('dlgSaque').show()" />
+				<p:commandButton value="Transferência" disabled="#{manterClienteBean.contaCliente.identificador eq null}"/>			
 			</h:panelGrid>
 			
 			<br/>
@@ -189,14 +193,42 @@
 				<p:inputText id="saldoInicial" value="#{operacoesBancariasBean.contaCliente.saldo}"/>
 
 
-				<p:commandButton value="Salvar" action="#{operacoesBancariasBean.abrirConta()}" />
+				<p:commandButton value="Salvar" action="#{operacoesBancariasBean.abrirConta()}" >
+					<f:setPropertyActionListener value="#{manterClienteBean.clienteSelecionado}" target="#{operacoesBancariasBean.clienteSelecionado}"></f:setPropertyActionListener>
+				</p:commandButton>
 				<p:commandButton value="Cancelar" />
 				
 			</h:panelGrid>
 			
-			
-			
 		</p:dialog>
+		
+		<p:dialog widgetVar="dlgSaque" id="dlg-saque"
+			modal="true" resizable="false" 
+			closeOnEscape="true" draggable="false" 
+			width="350" height="160">
+			
+			<h:panelGrid columns="2">
+				
+				<h:outputLabel value="Valor: " />
+				<p:inputText value="#{operacoesBancariasBean.valorSaque}"/>
+			
+			</h:panelGrid>
+			
+			<p:spacer height="5"/>
+	
+			<p:separator />
+	
+			<h:panelGrid columns="2" cellpadding="10">
+			
+				<p:commandButton value="Ok" actionListener="#{operacoesBancariasBean.efetuarSaque()}"> 
+				</p:commandButton>
+				
+				<p:commandButton value="Cancelar">
+				</p:commandButton>
+				
+			</h:panelGrid>
+			
+			</p:dialog>
 		
 		
 		</h:form>

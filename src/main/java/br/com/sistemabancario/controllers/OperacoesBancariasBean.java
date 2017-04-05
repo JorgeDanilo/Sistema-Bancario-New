@@ -23,9 +23,19 @@ public class OperacoesBancariasBean implements Serializable {
 	@Inject
 	private ContaService contaService;
 	
+	private Double valorSaque;
+	 
+	/**
+	 *
+	 * Método responsavel por abrir uma conta para o usuario.
+	 */
 	public void abrirConta() {
 		
+		this.contaCliente.setTitular(clienteSelecionado);
+		
 		this.contaService.salvar(contaCliente);
+		
+//		TODO: implementar a mensagem de sucesso e atualizar as modais...
 		
 		this.inicializarOperacoesConta();
 		
@@ -35,6 +45,32 @@ public class OperacoesBancariasBean implements Serializable {
 		
 		this.contaCliente = this.contaService.buscarContaPorCliente(clienteSelecionado);
 		
+		System.out.println(clienteSelecionado);
+	}
+	
+	public void efetuarSaque() {
+		
+
+		if (valorSaque != null && valorSaque > 0) {
+
+			try {
+				
+				this.contaCliente = this.contaService.buscarContaPorCliente(clienteSelecionado);
+
+				this.contaService.sacar(contaCliente, valorSaque);
+
+				this.inicializarOperacoesConta();
+
+
+			} catch (Exception e) {
+				
+				System.out.println(e.getMessage());
+			}
+
+		} else {
+
+//			facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro.", "Valor válido não informado!"));
+		}
 	}
 
 	public Conta getContaCliente() {
@@ -60,7 +96,14 @@ public class OperacoesBancariasBean implements Serializable {
 	public void setContaService(ContaService contaService) {
 		this.contaService = contaService;
 	}
-	
+
+	public Double getValorSaque() {
+		return valorSaque;
+	}
+
+	public void setValorSaque(Double valorSaque) {
+		this.valorSaque = valorSaque;
+	}
 	
 
 }

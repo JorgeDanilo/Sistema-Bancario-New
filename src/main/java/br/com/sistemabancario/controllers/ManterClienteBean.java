@@ -9,7 +9,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.com.sistemabancario.modelo.Cliente;
+import br.com.sistemabancario.modelo.Conta;
 import br.com.sistemabancario.services.ClienteService;
+import br.com.sistemabancario.services.ContaService;
 import br.com.sistemabancario.util.FacesMessages;
 
 @Named
@@ -26,6 +28,12 @@ public class ManterClienteBean implements Serializable {
 	@Inject
 	private ClienteService service;
 	
+	@Inject
+	private ContaService contaService;
+	
+	@Inject
+	private OperacoesBancariasBean operacoesBancariasBean = new OperacoesBancariasBean();
+	
 	private Collection<Cliente> clientesCadastrados;
 	
 	private static final String MSG_ALTERADO = "Cliente alterado com sucesso";
@@ -34,6 +42,7 @@ public class ManterClienteBean implements Serializable {
 	
 	private Cliente ClienteSelecionado;
 
+	private Conta contaCliente = new Conta();
 	
 	@PostConstruct
 	private void inicializaLista() {
@@ -106,7 +115,23 @@ public class ManterClienteBean implements Serializable {
 	public String irOperacoesBancarias() {
 		return "operacoesBancarias.xhtml";
 	}
+
 	
+	/**
+	 *  Método responsável por buscar o a conta do cliente.
+	 */
+	public void inicializarOperacoesBancarias() {
+		
+		this.contaCliente = this.contaService.buscarContaPorCliente(ClienteSelecionado);
+		
+		if ( ClienteSelecionado != null ) {
+			
+			this.operacoesBancariasBean.setClienteSelecionado(ClienteSelecionado);
+			
+			this.operacoesBancariasBean.setContaCliente(new Conta());
+		}
+		
+	}
 	
 	public Cliente getCliente() {
 		return cliente;
@@ -141,6 +166,17 @@ public class ManterClienteBean implements Serializable {
 	public void setClienteSelecionado(Cliente clienteSelecionado) {
 		ClienteSelecionado = clienteSelecionado;
 	}
+
+
+	public Conta getContaCliente() {
+		return contaCliente;
+	}
+
+
+	public void setContaCliente(Conta contaCliente) {
+		this.contaCliente = contaCliente;
+	}
+	
 	
 
 }

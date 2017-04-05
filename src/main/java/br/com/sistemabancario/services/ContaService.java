@@ -11,7 +11,10 @@ import org.hibernate.Session;
 
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.modelo.Conta;
+import br.com.sistemabancario.modelo.Transacao;
+import br.com.sistemabancario.modelo.enums.EnumTipoTransacao;
 import br.com.sistemabancario.util.Transacional;
+import br.com.sistemabancario.util.UtilData;
 
 public class ContaService implements Serializable {
 
@@ -20,10 +23,13 @@ public class ContaService implements Serializable {
 	@Inject
 	private EntityManager manager;
 	
+	@Inject
+	private TransacaoService transacaoService;
+	
 	@Transacional
 	public void salvar(Conta conta) {
 		
-		this.manager.persist(conta);
+		this.manager.merge(conta);
 	}
 
 	
@@ -55,6 +61,39 @@ public class ContaService implements Serializable {
 		Criteria criteria = session.createCriteria(Conta.class);
 		
 		return criteria.list();
+	}
+
+	
+	@Transacional
+	public void sacar(Conta contaSaque, double valor) {
+
+		if (contaSaque.getSaldo() - valor >= 0) {
+
+			contaSaque.setSaldo(contaSaque.getSaldo() - valor);
+			
+			this.manager.merge(contaSaque);
+
+			this.historicoTransacao(null, contaSaque, valor, "saque na conta " + contaSaque.getNumero(), EnumTipoTransacao.SAQUE);
+
+		} else {
+
+//			throw new SaldoInsuficienteException();
+		}
+	}
+	
+	protected void historicoTransacao(Conta contaDebito, Conta contaCredito, double valor, String descr, EnumTipoTransacao tipoTransacao) {
+
+		Transacao transacao = new Transacao(UtilData.data(), contaDebito, contaCredito, valor, descr, tipoTransacao);
+
+		if (contaDebito != null) {
+
+			contaDebito.getTransacoes().add(transacao);
+
+		}
+
+		contaCredito.getTransacoes().add(transacao);
+
+		transacaoService.salvar(transacao);
 	}
 
 }

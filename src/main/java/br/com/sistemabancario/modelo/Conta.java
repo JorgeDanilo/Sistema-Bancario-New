@@ -14,6 +14,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.hibernate.validator.constraints.Range;
+
 import br.com.sistemabancario.util.UtilData;
 
 @Entity
@@ -44,6 +46,9 @@ public class Conta extends EntidadeBanco {
 	@JoinColumn(name = "id_titular")
 	private Cliente titular;
 	
+	@Transient
+	private Boolean isContaCriada;
+	
 		// construtor padrão da classe Conta que define a data de criação da conta e inicializa o array de transacao
 		public Conta() {
 			dataAbertura = UtilData.data();
@@ -61,7 +66,6 @@ public class Conta extends EntidadeBanco {
 	
 	@Override
 	public Long getIdentificador() {
-		// TODO Auto-generated method stub
 		return identificador;
 	}
 
@@ -115,6 +119,14 @@ public class Conta extends EntidadeBanco {
 
 	public void setIdentificador(Long identificador) {
 		this.identificador = identificador;
+	}
+	
+	public Boolean getIsContaCriada() {
+		return isContaCriada;
+	}
+
+	public void setIsContaCriada(Boolean isContaCriada) {
+		this.isContaCriada = isContaCriada;
 	}
 
 	@Override
