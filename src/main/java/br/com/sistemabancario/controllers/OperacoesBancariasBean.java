@@ -1,14 +1,19 @@
 package br.com.sistemabancario.controllers;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import br.com.sistemabancario.excecoes.SaldoInsuficienteException;
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.modelo.Conta;
+import br.com.sistemabancario.modelo.Transacao;
 import br.com.sistemabancario.services.ContaService;
+import br.com.sistemabancario.services.TransacaoService;
+import br.com.sistemabancario.util.FacesMessages;
 
 @Named
 @SessionScoped
@@ -16,14 +21,27 @@ public class OperacoesBancariasBean implements Serializable {
 
 	private static final long serialVersionUID = -8707024590728060564L;
 	
+	
+	@Inject
+	private FacesMessages messages;
+	
+	
 	private Conta contaCliente = new Conta();
+	
 	
 	private Cliente clienteSelecionado;
 	
 	@Inject
 	private ContaService contaService;
 	
+	@Inject
+	private TransacaoService transacaoService;
+	
+	
 	private Double valorSaque;
+	
+	
+	private Collection<Transacao> transacaoConta;
 	 
 	/**
 	 *
@@ -35,21 +53,20 @@ public class OperacoesBancariasBean implements Serializable {
 		
 		this.contaService.salvar(contaCliente);
 		
-//		TODO: implementar a mensagem de sucesso e atualizar as modais...
+		messages.info("Conta criada com Sucesso !");
 		
 		this.inicializarOperacoesConta();
 		
 	}
 
-	private void inicializarOperacoesConta() {
-		
-		this.contaCliente = this.contaService.buscarContaPorCliente(clienteSelecionado);
-		
-		System.out.println(clienteSelecionado);
-	}
 	
+	
+	/**
+	 * Método responsável por efetuar o saque da conta.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 */
 	public void efetuarSaque() {
-		
 
 		if (valorSaque != null && valorSaque > 0) {
 
@@ -61,16 +78,36 @@ public class OperacoesBancariasBean implements Serializable {
 
 				this.inicializarOperacoesConta();
 
-
-			} catch (Exception e) {
+				messages.info("Saque realizado com sucesso");
 				
-				System.out.println(e.getMessage());
+			} catch (SaldoInsuficienteException e) {
+				
+				messages.error(e.getMessage());
 			}
 
 		} else {
 
-//			facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro.", "Valor válido não informado!"));
+			messages.error("Valor válido não informado!");
 		}
+	}
+	
+	
+	/**
+	 * Método responsável por iniciar as operações bancárias.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 */
+	private void inicializarOperacoesConta() {
+		
+		this.contaCliente = this.contaService.buscarContaPorCliente(clienteSelecionado);
+		
+		this.valorSaque = 0D;
+		
+		if ( this.contaCliente != null && this.contaCliente.getIdentificador() !=  null ) {
+			
+			this.setTransacaoConta(this.transacaoService.listarTransacoesPorConta(contaCliente.getIdentificador()));
+		}
+		
 	}
 
 	public Conta getContaCliente() {
@@ -104,6 +141,16 @@ public class OperacoesBancariasBean implements Serializable {
 	public void setValorSaque(Double valorSaque) {
 		this.valorSaque = valorSaque;
 	}
-	
 
+
+	public Collection<Transacao> getTransacaoConta() {
+		return transacaoConta;
+	}
+
+
+	public void setTransacaoConta(Collection<Transacao> transacaoConta) {
+		this.transacaoConta = transacaoConta;
+	}
+	
+	
 }

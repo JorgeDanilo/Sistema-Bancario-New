@@ -147,25 +147,28 @@
 			
 			<p:fieldset legend="Histórico de Transações">
 			
-				<p:dataTable emptyMessage="Nenhum Histórico encontrado">
+				<p:dataTable emptyMessage="Nenhum Histórico encontrado" var="transacao"
+					value="#{operacoesBancariasBean.transacaoConta}">
 					<p:column headerText="Tipo Transação" width="10">
-						<p:outputLabel value="SAQUE" />
+						<p:outputLabel value="#{transacao.tipoTransacao}" />
 					</p:column>
 					
 					<p:column headerText="Titular/Conta Destino" width="10">
-						<p:outputLabel value="Jorge" />
+						<p:outputLabel value="#{transacao.contaCredito.titular.nome}" />
 					</p:column>
 					
 					<p:column headerText="Titular/Conta Débito" width="10">
-						<p:outputLabel value="Monstro" />
+						<p:outputLabel value="#{transacao.contaDebito.titular.nome}" />
 					</p:column>
 					
 					<p:column headerText="Data" width="10">
-						<p:outputLabel value="20/11/2007" />
+						<p:outputLabel value="#{transacao.data}" />
 					</p:column>
 					
 					<p:column headerText="Valor" width="10">
-						<p:outputLabel value="R$ 250,00" />
+						<p:outputLabel value="#{transacao.valor}" >
+							<f:convertNumber currencySymbol="R$" type="currency" groupingUsed="true" />
+						</p:outputLabel>
 					</p:column>
 					
 				</p:dataTable>

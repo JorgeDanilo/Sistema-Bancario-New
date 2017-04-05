@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 
+import br.com.sistemabancario.excecoes.SaldoInsuficienteException;
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.modelo.Conta;
 import br.com.sistemabancario.modelo.Transacao;
@@ -65,7 +66,7 @@ public class ContaService implements Serializable {
 
 	
 	@Transacional
-	public void sacar(Conta contaSaque, double valor) {
+	public void sacar(Conta contaSaque, double valor) throws SaldoInsuficienteException {
 
 		if (contaSaque.getSaldo() - valor >= 0) {
 
@@ -77,7 +78,7 @@ public class ContaService implements Serializable {
 
 		} else {
 
-//			throw new SaldoInsuficienteException();
+			throw new SaldoInsuficienteException();
 		}
 	}
 	
