@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<p:dialog header="Abrir Conta"  widgetVar="dlgCriarConta" id="dlg-criar-conta" 
+			modal="true" resizable="false" 
+			closeOnEscape="true" draggable="false" 
+			width="350" height="160" >
+			
+			<h:panelGrid columns="2" style="margin-top: 20px;" id="pnl-criar-conta">	
+				
+				<p:outputLabel for="dataAbertura" value="Abertura: "/>
+				<p:outputLabel id="dataAbertura" value="#{operacoesBancariasBean.contaCliente.dataAbertura}" >
+					<f:convertDateTime pattern="dd/MM/yyyy" />
+				</p:outputLabel>
+				
+				<p:outputLabel for="numConta" value="Número: "/>
+				<p:inputText id="numConta" value="#{operacoesBancariasBean.contaCliente.numero}"/>
+				
+				<p:outputLabel for="saldoInicial" value="Saldo Inicial: "/>
+				<p:inputText id="saldoInicial" value="#{operacoesBancariasBean.contaCliente.saldo}"/>
+
+
+				<p:commandButton value="Salvar" action="#{operacoesBancariasBean.abrirConta()}" >
+					<f:setPropertyActionListener value="#{manterClienteBean.clienteSelecionado}" target="#{operacoesBancariasBean.clienteSelecionado}"></f:setPropertyActionListener>
+				</p:commandButton>
+				<p:commandButton value="Cancelar" />
+				
+			</h:panelGrid>
+			
+		</p:dialog>
+	
+	</html>
+	

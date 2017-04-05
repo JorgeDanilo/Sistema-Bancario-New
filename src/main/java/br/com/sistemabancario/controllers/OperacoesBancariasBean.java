@@ -7,6 +7,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import br.com.sistemabancario.excecoes.ContaNaoExisteException;
 import br.com.sistemabancario.excecoes.SaldoInsuficienteException;
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.modelo.Conta;
@@ -21,15 +22,8 @@ public class OperacoesBancariasBean implements Serializable {
 
 	private static final long serialVersionUID = -8707024590728060564L;
 	
-	
 	@Inject
 	private FacesMessages messages;
-	
-	
-	private Conta contaCliente = new Conta();
-	
-	
-	private Cliente clienteSelecionado;
 	
 	@Inject
 	private ContaService contaService;
@@ -37,15 +31,22 @@ public class OperacoesBancariasBean implements Serializable {
 	@Inject
 	private TransacaoService transacaoService;
 	
+	private Conta contaCliente = new Conta();
+	
+	private Cliente clienteSelecionado;
 	
 	private Double valorSaque;
 	
+	private Double valorDeposito;
+	
+	private int numeroContaDeposito;
 	
 	private Collection<Transacao> transacaoConta;
 	 
 	/**
-	 *
 	 * Método responsavel por abrir uma conta para o usuario.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
 	 */
 	public void abrirConta() {
 		
@@ -93,6 +94,41 @@ public class OperacoesBancariasBean implements Serializable {
 	
 	
 	/**
+	 * Método responsável por realizar a ação de deposito.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 */
+	public void efetuarDeposito() {
+		
+		if( valorDeposito != null && valorDeposito > 0 ) {
+			
+			try {
+				
+				Conta contaDestino = this.contaService.buscarContaPorNumero(numeroContaDeposito);
+				
+				Conta clienteOrigem = this.contaService.buscarContaPorCliente(clienteSelecionado);
+				
+				this.contaService.depositar(clienteOrigem, contaDestino, valorDeposito);
+				
+				this.inicializarOperacoesConta();
+				
+				messages.info("Depósito Realizado com sucesso");
+				
+			} catch ( ContaNaoExisteException ex ) {
+				
+				messages.error(ex.getMessage());
+						
+			} 
+			
+		} else {
+			
+			messages.error("Valor válido não informado");
+		}
+		
+	}
+	
+	
+	/**
 	 * Método responsável por iniciar as operações bancárias.
 	 * 
 	 * @author Jorge Danilo Gomes da Silva
@@ -103,6 +139,8 @@ public class OperacoesBancariasBean implements Serializable {
 		
 		this.valorSaque = 0D;
 		
+		this.valorDeposito = 0D;
+		
 		if ( this.contaCliente != null && this.contaCliente.getIdentificador() !=  null ) {
 			
 			this.setTransacaoConta(this.transacaoService.listarTransacoesPorConta(contaCliente.getIdentificador()));
@@ -110,6 +148,8 @@ public class OperacoesBancariasBean implements Serializable {
 		
 	}
 
+	
+	
 	public Conta getContaCliente() {
 		return contaCliente;
 	}
@@ -150,6 +190,28 @@ public class OperacoesBancariasBean implements Serializable {
 
 	public void setTransacaoConta(Collection<Transacao> transacaoConta) {
 		this.transacaoConta = transacaoConta;
+	}
+
+
+	public Double getValorDeposito() {
+		return valorDeposito;
+	}
+
+
+	public void setValorDeposito(Double valorDeposito) {
+		this.valorDeposito = valorDeposito;
+	}
+
+
+
+	public int getNumeroContaDeposito() {
+		return numeroContaDeposito;
+	}
+
+
+
+	public void setNumeroContaDeposito(int numeroContaDeposito) {
+		this.numeroContaDeposito = numeroContaDeposito;
 	}
 	
 	
