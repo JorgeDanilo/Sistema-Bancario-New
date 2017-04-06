@@ -3,12 +3,19 @@ package br.com.sistemabancario.controllers;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.ValidationException;
 
+import br.com.sistemabancario.excecoes.CamposObrigatoriosException;
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.modelo.Conta;
 import br.com.sistemabancario.modelo.Transacao;
@@ -69,23 +76,32 @@ public class ManterClienteBean implements Serializable {
 	 */
 	public void salvar() {
 		
-		if ( this.cliente.getIdentificador() == null ) {
-				
-			this.service.salvar(this.cliente);
-				
-			messages.info(MSG_CADASTRO);
+		try {
 			
-		} else {
+			if ( this.cliente.getIdentificador() == null ) {
 				
-			this.service.atualizar(this.cliente);
+				this.service.salvar(this.cliente);
+				
+				messages.info(MSG_CADASTRO);
+				
+			} else {
+				
+				this.service.atualizar(this.cliente);
+				
+				messages.info(MSG_ALTERADO);
+			}
 			
-			messages.info(MSG_ALTERADO);
+			
+			this.inicializaLista();
+			
+			this.limpar();
+			
+			
+		} catch (CamposObrigatoriosException e) {
+			
+			messages.error(e.getMessage());
 		}
-			
-			
-		this.inicializaLista();
 		
-		this.limpar();
 	}
 	
 	
@@ -134,8 +150,28 @@ public class ManterClienteBean implements Serializable {
 	public void limpar() {
 		
 		this.cliente = new Cliente();
+		
 	}
 	
+	
+	/**
+	 * Método responsável por validar email.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva.
+	 * 
+	 * @param fc
+	 * @param component
+	 * @param value
+	 * @throws ValidationException
+	 */
+	public void validarEmail(FacesContext fc, UIComponent component, Object value) throws ValidationException {
+		
+		String email = value.toString();
+		
+		if( ! email.contains("@") ) {
+			throw new ValidatorException(new FacesMessage("Email não é válido"));
+		}
+	}
 	
 	public Cliente getCliente() {
 		return cliente;

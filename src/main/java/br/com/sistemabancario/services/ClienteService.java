@@ -7,6 +7,7 @@ import java.util.Date;
 import javax.inject.Inject;
 
 import br.com.sistemabancario.dao.ClienteDao;
+import br.com.sistemabancario.excecoes.CamposObrigatoriosException;
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.util.Transacional;
 
@@ -40,9 +41,11 @@ public class ClienteService implements Serializable {
 	 * Método responsável por salvar a entidade cliente.
 	 * @author Jorge Danilo Gomes da Silva 
 	 * @param cliente
+	 * @throws CamposObrigatoriosException 
 	 */
 	@Transacional
-	public void salvar(Cliente cliente) {
+	public void salvar(Cliente cliente) throws CamposObrigatoriosException {
+		this.validarCamposObrigatorios(cliente);
 		cliente.setDtCadastro(new Date());
 		this.getClienteDao().salvar(cliente);
 		
@@ -63,9 +66,11 @@ public class ClienteService implements Serializable {
 	 * Método responsável por atualizar a entidade cliente.
 	 * @author Jorge Danilo Gomes da Silva
 	 * @param cliente
+	 * @throws CamposObrigatoriosException 
 	 */
 	@Transacional
-	public void atualizar(Cliente cliente) {
+	public void atualizar(Cliente cliente) throws CamposObrigatoriosException {
+		this.validarCamposObrigatorios(cliente);
 		this.getClienteDao().salvar(cliente);
 	}
 
@@ -79,6 +84,16 @@ public class ClienteService implements Serializable {
 		this.getClienteDao().remover(cliente);
 	}
 
+	private void validarCamposObrigatorios(Cliente cliente) throws CamposObrigatoriosException {
+		
+		if (cliente == null || cliente.getNome().equals("")
+				|| cliente.getCpf().replace("-", "").replace(".", "").trim().equals("") 
+				|| cliente.getDtNascimento().equals("") || cliente.getEndereco().equals("") 
+				|| cliente.getEmail().equals("") ) {
+			
+			throw new CamposObrigatoriosException();
+		}
+	}
 	
 	/**
 	 * Responsável por retornar a instancia do objeto ClienteDao.

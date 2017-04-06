@@ -19,7 +19,9 @@
 				<p:inputMask mask="999.999.999-99" id="cpf" value="#{manterClienteBean.cliente.cpf}" style="width: 300px;" /> 
 				
 				<p:outputLabel for="email" value="Email" />
-				<p:inputText id="email" value="#{manterClienteBean.cliente.email}" maxlength="100" style="width: 300px;"/>
+				<p:inputText id="email" value="#{manterClienteBean.cliente.email}" maxlength="100" style="width: 300px;" validator="#{manterClienteBean.validarEmail}" >
+					<p:ajax event="blur" />
+				</p:inputText>
 				
 				<p:outputLabel for="telefone" value="Telefone" />
 				<p:inputMask id="telefone" mask="99-9?99999999" value="#{manterClienteBean.cliente.telefone}" style="width: 300px;"/>
@@ -28,7 +30,7 @@
 				<p:inputText id="endereco" value="#{manterClienteBean.cliente.endereco}" style="width: 300px;"/>
 				
 				<p:outputLabel for="dtNascimento" value="Data de Nascimento" />
-				<p:calendar id="dtNascimento" pattern="dd/MM/yyyy" value="#{manterClienteBean.cliente.dtNascimento}" />
+				<p:calendar id="dtNascimento" pattern="dd/MM/yyyy" value="#{manterClienteBean.cliente.dtNascimento}" mask="dd/MM/yyyy"/>
 				
 			</h:panelGrid>
 			

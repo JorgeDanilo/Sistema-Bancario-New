@@ -60,13 +60,15 @@
 	
 	<h:panelGrid columns="2" cellpadding="10">
 		
-		<p:commandButton value="Realizar Transferência" actionListener="#{operacoesBancariasBean.realizarTransferencia()}">
-		
+		<p:commandButton value="Realizar Transferência" 
+			actionListener="#{operacoesBancariasBean.realizarTransferencia()}"
+			process="dlg-transferencia"
+			update="@form"
+			oncomplete="if(!args.validationFailded) PF('dlgTransferencia').hide()" >
 		</p:commandButton>
 		
-		<p:commandButton value="Cancelar" >
+		<p:commandButton value="Cancelar" oncomplete="if(!args.validationFailded) PF('dlgTransferencia').hide()" />
 				
-		</p:commandButton>
 		
 	</h:panelGrid>
 

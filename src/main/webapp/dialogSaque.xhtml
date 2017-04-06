@@ -22,11 +22,13 @@
 	
 			<h:panelGrid columns="2" cellpadding="10">
 			
-				<p:commandButton value="Ok" actionListener="#{operacoesBancariasBean.efetuarSaque()}"> 
+				<p:commandButton value="Ok" actionListener="#{operacoesBancariasBean.efetuarSaque()}"
+					process="dlg-saque"
+					update="@form"
+					oncomplete="if(!args.validationFailded) PF('dlgSaque').hide() "> 
 				</p:commandButton>
 				
-				<p:commandButton value="Cancelar">
-				</p:commandButton>
+				<p:commandButton value="Cancelar" oncomplete="if(!args.validationFailded) PF('dlgSaque').hide() " />
 				
 			</h:panelGrid>
 			

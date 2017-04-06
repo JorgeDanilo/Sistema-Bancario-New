@@ -5,12 +5,12 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Past;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -35,6 +35,7 @@ public class Pessoa extends EntidadeBanco {
 	@Column(name = "email", nullable = true)
 	private String email;
 
+	@Past(message = "Data futura não é permitida")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dtNascimento;
 
