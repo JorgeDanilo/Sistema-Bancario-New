@@ -1,7 +1,6 @@
 package br.com.sistemabancario.controllers;
 
 import java.io.Serializable;
-import java.util.Collection;
 
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Inject;
@@ -11,9 +10,7 @@ import br.com.sistemabancario.excecoes.ContaNaoExisteException;
 import br.com.sistemabancario.excecoes.SaldoInsuficienteException;
 import br.com.sistemabancario.modelo.Cliente;
 import br.com.sistemabancario.modelo.Conta;
-import br.com.sistemabancario.modelo.Transacao;
 import br.com.sistemabancario.services.ContaService;
-import br.com.sistemabancario.services.TransacaoService;
 import br.com.sistemabancario.util.FacesMessages;
 
 @Named
@@ -28,9 +25,6 @@ public class OperacoesBancariasBean implements Serializable {
 	@Inject
 	private ContaService contaService;
 	
-	@Inject
-	private TransacaoService transacaoService;
-	
 	private Conta contaCliente = new Conta();
 	
 	private Cliente clienteSelecionado;
@@ -39,7 +33,10 @@ public class OperacoesBancariasBean implements Serializable {
 	
 	private Double valorDeposito;
 	
+	private Double valorTransferencia;
+	
 	private int numeroContaDeposito;
+	
 	
 	/**
 	 * Método responsavel por abrir uma conta para o usuario.
@@ -127,6 +124,44 @@ public class OperacoesBancariasBean implements Serializable {
 	
 	
 	/**
+	 * Método responsável por realizar a transferencia entre contas.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 */
+	public void realizarTransferencia() {
+		
+		if( valorTransferencia != null && valorTransferencia > 0 ) {
+			
+			try {
+				
+				Conta contaDestinoTransferencia = this.contaService.buscarContaPorNumero(this.numeroContaDeposito);
+				
+				this.contaCliente = this.contaService.buscarContaPorNumero(this.contaCliente.getNumero());
+				
+				this.contaService.transferir(contaCliente, valorTransferencia, contaDestinoTransferencia);
+				
+				this.inicializarOperacoesConta();
+				
+				messages.info("TransferÊncia realizada com sucesso!");
+				
+			} catch (ContaNaoExisteException e) {
+				
+				messages.error(e.getMessage());
+				
+			} catch (SaldoInsuficienteException ex) {
+				
+				messages.error(ex.getMessage());
+			}
+			
+		} else {
+			
+			messages.error("Valor válido não informado!");
+		}
+		
+	}
+	
+	
+	/**
 	 * Método responsável por iniciar as operações bancárias.
 	 * 
 	 * @author Jorge Danilo Gomes da Silva
@@ -139,8 +174,21 @@ public class OperacoesBancariasBean implements Serializable {
 		
 		this.valorDeposito = 0D;
 		
+		
 	}
 
+	
+	/**
+	 * Método responsável por popular o objeto Cliente.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 */
+	public void inicializaDadosCliente() {
+		
+		this.contaCliente = this.contaService.buscarContaPorCliente(clienteSelecionado);
+		
+		System.out.println(this.contaCliente);
+	}
 	
 	
 	public Conta getContaCliente() {
@@ -196,6 +244,19 @@ public class OperacoesBancariasBean implements Serializable {
 	public void setNumeroContaDeposito(int numeroContaDeposito) {
 		this.numeroContaDeposito = numeroContaDeposito;
 	}
+
+
+
+	public Double getValorTransferencia() {
+		return valorTransferencia;
+	}
+
+
+
+	public void setValorTransferencia(Double valorTransferencia) {
+		this.valorTransferencia = valorTransferencia;
+	}
+	
 	
 	
 }

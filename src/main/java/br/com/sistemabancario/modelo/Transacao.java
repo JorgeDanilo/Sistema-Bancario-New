@@ -28,7 +28,7 @@ public class Transacao extends EntidadeBanco implements Comparable<Transacao> {
 	@Column(name = "id_transacao")
 	private Long identificador;
 
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	private Date data;
 
 	@ManyToOne

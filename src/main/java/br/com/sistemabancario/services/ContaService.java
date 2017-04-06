@@ -16,7 +16,7 @@ import br.com.sistemabancario.util.Transacional;
 import br.com.sistemabancario.util.UtilData;
 
 /**
- * Classe de Servico responsavel por implementação das regras de negócio.
+ * Classe de Servico responsável por implementação das regras de negócio. 
  * 
  * @author Jorge Danilo Gomes da Silva
  */
@@ -34,8 +34,6 @@ public class ContaService implements Serializable {
 	public void salvar(Conta conta) {
 		
 		this.contaDao.salvar(conta);
-		
-//		this.manager.merge(conta);
 	}
 
 	
@@ -63,12 +61,6 @@ public class ContaService implements Serializable {
 	public Collection<Conta> listar() {
 		
 		return this.getContaDao().listar();
-		
-//		Session session = (Session) manager.getDelegate();
-//		
-//		Criteria criteria = session.createCriteria(Conta.class);
-//		
-//		return criteria.list();
 	}
 
 	
@@ -76,11 +68,16 @@ public class ContaService implements Serializable {
 	public void sacar(Conta contaSaque, double valor) throws SaldoInsuficienteException {
 
 		if (contaSaque.getSaldo() - valor >= 0) {
+			
+			if ( this.isPermiteCobrarSaque(contaSaque.getIdentificador()) ) {
+				
+				contaSaque.setSaldo( contaSaque.getSaldo() - valor - EnumTarifario.SAQUE.getPreco());
+				
+			} else {
+				
+				contaSaque.setSaldo( contaSaque.getSaldo() - valor );
+			}
 
-			contaSaque.setSaldo(contaSaque.getSaldo() - valor);
-			
-//			this.manager.merge(contaSaque);
-			
 			this.getContaDao().salvar(contaSaque);
 
 			this.historicoTransacao(null, contaSaque, valor, "saque na conta " + contaSaque.getNumero(), EnumTipoTransacao.SAQUE);
@@ -92,7 +89,17 @@ public class ContaService implements Serializable {
 	}
 	
 	
-
+	/**
+	 * Método responsavel por verificar se é permitido cobrar por um saque.
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 * @return boolean
+	 */
+	public boolean isPermiteCobrarSaque(Long identificador) {
+		
+		return this.transacaoService.buscarTransacaoPorSaque(identificador);		
+		
+	}
 	
 	/**
 	 * Método responsável por realizar o depósito.
@@ -105,15 +112,7 @@ public class ContaService implements Serializable {
 	@Transacional
 	public void depositar(Conta contaOrigem, Conta contaDestino, Double valor) {
 		
-		contaOrigem.setSaldo(contaOrigem.getSaldo() - valor);
-		
 		contaDestino.setSaldo(contaDestino.getSaldo() + valor);
-
-//		this.manager.merge(contaOrigem);
-//		
-//		this.manager.merge(contaDestino);
-		
-		this.getContaDao().salvar(contaOrigem);
 		
 		this.getContaDao().salvar(contaDestino);
 		
@@ -150,7 +149,7 @@ public class ContaService implements Serializable {
 
 
 	/**
-	 * Método responsável por buscar conta por numero. Caso não exista lança exceção ContaNãoExisteException
+	 * Método responsável por buscar conta poupdater numero. Caso não exista lança exceção ContaNãoExisteException
 	 * 
 	 * @author Jorge Danilo Gomes da Silva
 	 * 
@@ -179,6 +178,96 @@ public class ContaService implements Serializable {
 	 */
 	public ContaDao getContaDao() {
 		return contaDao;
+	}
+
+
+	/**
+	 * Método responsável por realizar transferencia entre contas caso não tenha saldo suficiente e lançado uma exceção
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 * 
+	 * @param contaSaque
+	 * @param valor
+	 * @param contaDestino
+	 * @return
+	 * @throws SaldoInsuficienteException
+	 */
+	@Transacional
+	public boolean transferir(Conta contaSaque, Double valor, Conta contaDestino) throws SaldoInsuficienteException {
+		
+		return transferir(contaSaque, valor, contaDestino, "transferencia para conta " + contaDestino.getNumero());
+		
+	}
+
+	
+	/**
+	 * Método responsável por realizar transferencia entre contas caso não tenha saldo suficiente e lançado uma exceção
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 * 
+	 * @param contaSaque
+	 * @param valor
+	 * @param contaDestino
+	 * @param descr
+	 * @return
+	 * @throws SaldoInsuficienteException
+	 */
+	@Transacional
+	private boolean transferir(Conta contaSaque, Double valor, Conta contaDestino, String descr) throws SaldoInsuficienteException {
+		
+		if( contaSaque.getSaldo() - valor >= 0 ) {
+			
+			contaDestino.setSaldo(contaDestino.getSaldo() + valor );
+			
+			contaSaque.setSaldo(contaSaque.getSaldo() - valor - EnumTarifario.TRANSFERENCIA.getPreco() );
+			
+			this.getContaDao().salvar(contaSaque);
+			
+			this.getContaDao().salvar(contaDestino);
+			
+			
+			this.historicoTransacao(contaSaque, contaDestino, valor, descr, EnumTipoTransacao.TRANSFERENCIA);
+			
+			return true;
+			
+		} else {
+			
+			throw new SaldoInsuficienteException();
+		}
+		
+	}
+	
+	
+	/**
+	 * Método responsável por realizar debitos na conta
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 * @param contaOperacao
+	 * @param valor
+	 */
+	@Transacional
+	private void debito(Conta contaOperacao, Double valor) {
+		
+		contaOperacao.setSaldo(contaOperacao.getSaldo() - valor);
+		
+		this.getContaDao().salvar(contaOperacao);
+		
+	}
+
+
+	/**
+	 * Método responsável por realizar operações de credito na conta
+	 * 
+	 * @author Jorge Danilo Gomes da Silva
+	 * @param contaOperacao
+	 * @param valor
+	 */
+	@Transacional
+	protected void credito(Conta contaOperacao, double valor ) {
+		
+		contaOperacao.setSaldo(contaOperacao.getSaldo() + valor);
+		
+		this.getContaDao().salvar(contaOperacao);
 	}
 	
 	

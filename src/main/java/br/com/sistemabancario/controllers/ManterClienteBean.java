@@ -1,6 +1,7 @@
 package br.com.sistemabancario.controllers;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.annotation.PostConstruct;
@@ -118,6 +119,9 @@ public class ManterClienteBean implements Serializable {
 			
 			this.setTransacaoConta(this.transacaoService.listarTransacoesPorConta(contaCliente.getIdentificador()));
 			
+		} else {
+			
+			this.setTransacaoConta(new ArrayList<Transacao>());
 		}
 		
 	}

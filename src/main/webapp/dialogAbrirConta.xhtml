@@ -16,14 +16,17 @@
 					<f:convertDateTime pattern="dd/MM/yyyy" />
 				</p:outputLabel>
 				
-				<p:outputLabel for="numConta" value="Número: "/>
+				<p:outputLabel for="numConta" value="Número da Conta: "/>
 				<p:inputText id="numConta" value="#{operacoesBancariasBean.contaCliente.numero}"/>
 				
 				<p:outputLabel for="saldoInicial" value="Saldo Inicial: "/>
 				<p:inputText id="saldoInicial" value="#{operacoesBancariasBean.contaCliente.saldo}"/>
 
 
-				<p:commandButton value="Salvar" action="#{operacoesBancariasBean.abrirConta()}" >
+				<p:commandButton value="Salvar" action="#{operacoesBancariasBean.abrirConta()}" 
+					process="dlg-criar-conta"
+					update="@form"
+					oncomplete="if(!args.validationFailded) PF('dlgCriarConta').hide() ">
 					<f:setPropertyActionListener value="#{manterClienteBean.clienteSelecionado}" target="#{operacoesBancariasBean.clienteSelecionado}"></f:setPropertyActionListener>
 				</p:commandButton>
 				<p:commandButton value="Cancelar" />

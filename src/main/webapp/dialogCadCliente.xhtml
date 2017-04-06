@@ -16,7 +16,7 @@
 				<p:inputText id="nome" value="#{manterClienteBean.cliente.nome}" style="width: 300px;"/>
 				
 				<p:outputLabel for="cpf" value="CPF" />
-				<p:inputText id="cpf" value="#{manterClienteBean.cliente.cpf}" style="width: 300px;"/>
+				<p:inputMask mask="999.999.999-99" id="cpf" value="#{manterClienteBean.cliente.cpf}" style="width: 300px;" /> 
 				
 				<p:outputLabel for="email" value="Email" />
 				<p:inputText id="email" value="#{manterClienteBean.cliente.email}" maxlength="100" style="width: 300px;"/>
@@ -32,11 +32,24 @@
 				
 			</h:panelGrid>
 			
-			<p:commandButton value="Salvar" 
-				action="#{manterClienteBean.salvar()}" 
-				process="dialog-modal"
-				update="msg-dialog pn-dialog frm:tbClientes"
-				oncomplete="if(!args.validationFailded) PF('painelDialog').hide() "	/>
+			<p:spacer height="5" />
+	
+			<p:separator />
+			
+			<h:panelGrid columns="2" cellpadding="10">
+				
+				<p:commandButton value="Salvar" 
+					action="#{manterClienteBean.salvar()}" 
+					process="dialog-modal"
+					update="msg-dialog pn-dialog frm:tbClientes"
+					oncomplete="if(!args.validationFailded) PF('painelDialog').hide() "	/>
+					
+				<p:commandButton value="Cancelar" >
+				
+				</p:commandButton>
+				
+			</h:panelGrid>
+			
 		
 		</p:dialog>
 	

@@ -6,7 +6,8 @@ import br.com.sistemabancario.modelo.Entidade;
 
 
 /**
- * Interface Generica
+ * Interface Dao Generica
+ * 
  * @author Jorge Danilo Gomes da Silva
  *
  */

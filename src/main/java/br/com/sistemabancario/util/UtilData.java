@@ -4,6 +4,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Classe Utilitária para manipulação de data.
+ * 
+ * @author Jorge Danilo Gomes da Silva
+ *
+ */
 public class UtilData {
 
 	// representa Domingo

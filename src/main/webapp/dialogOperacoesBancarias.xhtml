@@ -39,14 +39,20 @@
 					disabled="#{manterClienteBean.contaCliente.identificador eq null}"
 					process="@this"
 					update="@form"
-					oncomplete="PF('dlgDeposito').show();"
-					/>
+					oncomplete="PF('dlgDeposito').show();" />
 					
 				<p:commandButton value="Saque" disabled="#{manterClienteBean.contaCliente.identificador eq null}" 
 					process="@this"
 					update="@form"
 					oncomplete="PF('dlgSaque').show()" />
-				<p:commandButton value="Transferência" disabled="#{manterClienteBean.contaCliente.identificador eq null}"/>			
+					
+				<p:commandButton value="Transferência" disabled="#{manterClienteBean.contaCliente.identificador eq null}"
+					process="@this"
+					update="@form"
+					oncomplete="PF('dlgTransferencia').show()" >
+						<p:ajax listener="#{operacoesBancariasBean.inicializaDadosCliente()}" process="@this" />
+					</p:commandButton>	
+							
 			</h:panelGrid>
 			
 			<p:separator />
